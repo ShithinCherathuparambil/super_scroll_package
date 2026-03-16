@@ -1,0 +1,27 @@
+name: super_scroll_example
+description: An example of how to use the super_scroll package.
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.1
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  super_scroll:
+    path: ../
+  flutter_dotenv: ^6.0.0
+  dio: ^5.9.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - .env
