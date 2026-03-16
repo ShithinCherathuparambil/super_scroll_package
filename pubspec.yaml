@@ -1,7 +1,8 @@
 name: super_scroll
-description: "A new Flutter package project."
-version: 0.0.1
-homepage:
+description: "A simple, lightweight, and powerful pagination library for Flutter."
+version: 0.1.0
+homepage: https://github.com/ShithinCherathuparambil/super_scroll_package
+repository: https://github.com/ShithinCherathuparambil/super_scroll_package
 
 environment:
   sdk: ^3.11.1
@@ -25,8 +26,8 @@ dev_dependencies:
 flutter:
 
   # To add assets to your package, add an assets section, like this:
-  assets:
-    - .env
+  # assets:
+  #   - .env
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
   #
