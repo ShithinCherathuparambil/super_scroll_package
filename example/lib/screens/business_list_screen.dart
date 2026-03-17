@@ -8,6 +8,7 @@ enum BusinessViewType {
   listViewSeparated,
   gridViewCount,
   gridViewExtent,
+  slivers,
   rawSuperScroll,
 }
 
@@ -65,7 +66,14 @@ class _BusinessListScreenState extends State<BusinessListScreen> {
             Expanded(
               child: Container(
                 color: Colors.blue[50],
-                child: const Icon(Icons.business, size: 40, color: Colors.blue),
+                child: business.logo['url'] != null
+                    ? Image.network(
+                        business.logo['url'],
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Icon(Icons.business, size: 40, color: Colors.blue),
+                      )
+                    : const Icon(Icons.business, size: 40, color: Colors.blue),
               ),
             ),
             Padding(
@@ -96,7 +104,12 @@ class _BusinessListScreenState extends State<BusinessListScreen> {
     return ListTile(
       leading: CircleAvatar(
         backgroundColor: Colors.blue[50],
-        child: const Icon(Icons.business, color: Colors.blue),
+        backgroundImage: business.logo['url'] != null
+            ? NetworkImage(business.logo['url'])
+            : null,
+        child: business.logo['url'] == null
+            ? const Icon(Icons.business, color: Colors.blue)
+            : null,
       ),
       title: Text(business.name),
       subtitle: Text(business.businessType),
@@ -111,6 +124,20 @@ class _BusinessListScreenState extends State<BusinessListScreen> {
           controller: _controller,
           onRefresh: () => _controller.refresh(),
           padding: const EdgeInsets.symmetric(horizontal: 16),
+          firstPageProgressIndicator: Column(
+            children: List.generate(
+              10,
+              (index) => ListTile(
+                leading: const SuperSkeleton.circle(size: 40),
+                title: const SuperSkeleton(height: 16, width: 150),
+                subtitle: const SuperSkeleton(height: 12, width: 220),
+              ),
+            ),
+          ),
+          newPageProgressIndicator: ListTile(
+            leading: const SuperSkeleton.circle(size: 40),
+            title: const SuperSkeleton(height: 16, width: 150),
+          ),
           itemBuilder: (context, business, index) => _buildItem(business),
         );
       case BusinessViewType.listViewSeparated:
@@ -118,6 +145,20 @@ class _BusinessListScreenState extends State<BusinessListScreen> {
           controller: _controller,
           onRefresh: () => _controller.refresh(),
           padding: const EdgeInsets.symmetric(horizontal: 16),
+          firstPageProgressIndicator: Column(
+            children: List.generate(
+              10,
+              (index) => ListTile(
+                leading: const SuperSkeleton.circle(size: 40),
+                title: const SuperSkeleton(height: 16, width: 150),
+                subtitle: const SuperSkeleton(height: 12, width: 220),
+              ),
+            ),
+          ),
+          newPageProgressIndicator: ListTile(
+            leading: const SuperSkeleton.circle(size: 40),
+            title: const SuperSkeleton(height: 16, width: 150),
+          ),
           itemBuilder: (context, business, index) => _buildItem(business),
           separatorBuilder: (context, index) => const Divider(height: 1),
         );
@@ -130,6 +171,42 @@ class _BusinessListScreenState extends State<BusinessListScreen> {
           childAspectRatio: 0.8,
           onRefresh: () => _controller.refresh(),
           padding: const EdgeInsets.all(16),
+          firstPageProgressIndicator: GridView.count(
+            crossAxisCount: 2,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
+            childAspectRatio: 0.8,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            children: List.generate(
+              8,
+              (index) => Card(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Expanded(child: SuperSkeleton()),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SuperSkeleton(height: 14, width: 100),
+                          const SizedBox(height: 4),
+                          const SuperSkeleton(height: 10, width: 60),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          newPageProgressIndicator: const Card(
+            child: Padding(
+              padding: EdgeInsets.all(8.0),
+              child: SuperSkeleton(height: 20),
+            ),
+          ),
           itemBuilder: (context, business, index) => _buildItem(business),
         );
       case BusinessViewType.gridViewExtent:
@@ -143,20 +220,41 @@ class _BusinessListScreenState extends State<BusinessListScreen> {
           padding: const EdgeInsets.all(16),
           itemBuilder: (context, business, index) => _buildItem(business),
         );
-      case BusinessViewType.rawSuperScroll:
-        return ListenableBuilder(
-          listenable: _controller,
-          builder: (context, _) {
-            return SuperScroll(
-              controller: _controller,
-              child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: _controller.items.length,
-                itemBuilder: (context, index) =>
-                    _buildItem(_controller.items[index]),
+      case BusinessViewType.slivers:
+        return SuperScroll(
+          controller: _controller,
+          showFooter: false,
+          child: CustomScrollView(
+            slivers: [
+              const SliverAppBar(
+                floating: true,
+                title: Text('Inside CustomScrollView'),
+                backgroundColor: Colors.blueGrey,
               ),
-            );
-          },
+              const SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Text('The list below is a SuperSliverList',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ),
+              SuperSliverList(
+                controller: _controller,
+                itemBuilder: (context, business, index) => _buildItem(business),
+              ),
+            ],
+          ),
+        );
+      case BusinessViewType.rawSuperScroll:
+        return SuperScroll(
+          controller: _controller,
+          showFooter: true,
+          child: ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: _controller.items.length,
+            itemBuilder: (context, index) =>
+                _buildItem(_controller.items[index]),
+          ),
         );
     }
   }
@@ -192,6 +290,10 @@ class _BusinessListScreenState extends State<BusinessListScreen> {
                 value: BusinessViewType.rawSuperScroll,
                 child: Text('Raw SuperScroll'),
               ),
+              const PopupMenuItem(
+                value: BusinessViewType.slivers,
+                child: Text('Sliver List'),
+              ),
             ],
           ),
           IconButton(
@@ -199,6 +301,48 @@ class _BusinessListScreenState extends State<BusinessListScreen> {
             onPressed: () => _controller.refresh(),
           ),
         ],
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(color: Colors.blue),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text('Super Scroll',
+                      style: TextStyle(color: Colors.white, fontSize: 24)),
+                  Text('Demo Examples',
+                      style: TextStyle(color: Colors.white70, fontSize: 14)),
+                ],
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text('Users List'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushReplacementNamed(context, '/');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.business_center),
+              title: const Text('Businesses List'),
+              selected: true,
+              onTap: () => Navigator.pop(context),
+            ),
+            ListTile(
+              leading: const Icon(Icons.group),
+              title: const Text('Communities List'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushReplacementNamed(context, '/communities');
+              },
+            ),
+          ],
+        ),
       ),
       body: Column(
         children: [

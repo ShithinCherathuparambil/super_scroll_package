@@ -25,6 +25,8 @@ class SuperScrollController<T> extends ChangeNotifier {
   bool _hasMore = true;
   int _currentPage = 1;
   Object? _error;
+  final Set<T> _selectedItems = {};
+  bool _isSelectionMode = false;
 
   SuperScrollController({
     required this.onFetch,
@@ -44,6 +46,49 @@ class SuperScrollController<T> extends ChangeNotifier {
 
   /// The error encountered during the last fetch, if any.
   Object? get error => _error;
+
+  /// The set of selected items.
+  Set<T> get selectedItems => _selectedItems;
+
+  /// Whether the controller is in selection mode.
+  bool get isSelectionMode => _isSelectionMode;
+
+  /// Toggles selection mode on or off.
+  void toggleSelectionMode(bool value) {
+    if (_isSelectionMode == value) {
+      return;
+    }
+    _isSelectionMode = value;
+    if (!_isSelectionMode) {
+      _selectedItems.clear();
+    }
+    notifyListeners();
+  }
+
+  /// Toggles selection for a specific item.
+  void toggleItemSelection(T item) {
+    if (_selectedItems.contains(item)) {
+      _selectedItems.remove(item);
+    } else {
+      _selectedItems.add(item);
+    }
+    notifyListeners();
+  }
+
+  /// Selects all currently loaded items.
+  void selectAll() {
+    _selectedItems.addAll(_items);
+    notifyListeners();
+  }
+
+  /// Clears all selections.
+  void clearSelection() {
+    _selectedItems.clear();
+    notifyListeners();
+  }
+
+  /// Checks if a specific item is selected.
+  bool isSelected(T item) => _selectedItems.contains(item);
 
   /// Loads the next page of data.
   Future<void> loadMore() async {

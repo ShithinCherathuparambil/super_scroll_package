@@ -7,10 +7,13 @@ A simple, lightweight, and powerful pagination library for Flutter.
 ## 🚀 Features
 
 - **One-Stop Widgets**: Use `SuperListView` or `SuperGridView` to implement pagination in seconds.
+- **Sliver Support**: Integrated `SuperSliverList` and `SuperSliverGrid` for complex scrolling effects.
+- **In-built Masonry**: Dependency-free `SuperMasonryGridView` for staggered/masonry layouts.
 - **Automatic Viewport Filling**: Automatically triggers `loadMore` until the screen is filled or data ends.
 - **Granular Indicators**: Specific widgets for first-page loading, new-page loading, errors, and empty states.
 - **Smart Refreshing**: Supports both full-list Refresh (Pull-to-Refresh) and specific page refreshing.
-- **Lightweight & Efficient**: Minimal dependencies, optimized for performance with large datasets.
+- **Selection Support**: In-built multi-selection management with `SuperScrollController`.
+- **Lightweight & Efficient**: Zero external layout dependencies, optimized for performance.
 
 ## 📦 Installation
 
@@ -61,6 +64,33 @@ SuperGridView.count(
   mainAxisSpacing: 8,
   crossAxisSpacing: 8,
   itemBuilder: (context, item, index) => GridItem(item),
+)
+```
+
+### 4. Use SuperMasonryGridView
+A dependency-free masonry grid that distributes items across columns.
+
+```dart
+SuperMasonryGridView(
+  controller: _controller,
+  crossAxisCount: 2,
+  mainAxisSpacing: 12,
+  crossAxisSpacing: 12,
+  itemBuilder: (context, item, index) => MasonryItem(item),
+)
+```
+
+### 5. Use SuperSliverList / SuperSliverGrid
+Perfect for use within a `CustomScrollView`.
+
+```dart
+CustomScrollView(
+  slivers: [
+    SuperSliverList(
+      controller: _controller,
+      itemBuilder: (context, item, index) => MySliverTile(item),
+    ),
+  ],
 )
 ```
 

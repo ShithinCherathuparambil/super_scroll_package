@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'super_scroll_controller.dart';
+import 'super_skeleton.dart';
 
 export 'super_scroll_controller.dart';
 export 'super_list_view.dart';
 export 'super_grid_view.dart';
+export 'super_skeleton.dart';
+export 'super_sliver_list.dart';
+export 'super_sliver_grid.dart';
+export 'super_masonry_grid_view.dart';
 
 /// A simple and lightweight pagination widget for Flutter.
 ///
@@ -41,6 +46,10 @@ class SuperScroll extends StatefulWidget {
   /// Widget to display when there are no more items to load.
   final Widget? noMoreItemsIndicator;
 
+  /// Whether to show the default footer (indicators) managed by SuperScroll.
+  /// Set to false if the child manages its own indicators (e.g., using SuperSliverList).
+  final bool showFooter;
+
   /// An optional ScrollController to monitor the scroll position.
   /// If not provided, an internal one will be created.
   final ScrollController? scrollController;
@@ -49,6 +58,7 @@ class SuperScroll extends StatefulWidget {
     required this.child,
     required this.controller,
     this.scrollOffset = 100.0,
+    this.showFooter = true,
     this.newPageProgressIndicator,
     this.firstPageProgressIndicator,
     this.firstPageErrorIndicator,
@@ -146,11 +156,19 @@ class _SuperScrollState extends State<SuperScroll> {
 
     // Handle First Page Loading
     if (items.isEmpty && isLoading) {
-      return Center(
-        child:
-            widget.firstPageProgressIndicator ??
-            const CircularProgressIndicator(),
-      );
+      return widget.firstPageProgressIndicator ??
+          const Center(
+            child: Padding(
+              padding: EdgeInsets.all(24.0),
+              child: Column(
+                children: [
+                  SuperSkeleton(height: 100, margin: EdgeInsets.only(bottom: 12)),
+                  SuperSkeleton(height: 100, margin: EdgeInsets.only(bottom: 12)),
+                  SuperSkeleton(height: 100),
+                ],
+              ),
+            ),
+          );
     }
 
     // Handle First Page Error
@@ -195,34 +213,39 @@ class _SuperScrollState extends State<SuperScroll> {
             child: widget.child,
           ),
         ),
-        if (isLoading)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: Center(
+        if (widget.showFooter) ...[
+          if (isLoading)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              child: Center(
+                child: widget.newPageProgressIndicator ??
+                    const SuperSkeleton(
+                      height: 20,
+                      width: 200,
+                      margin: EdgeInsets.symmetric(horizontal: 16),
+                    ),
+              ),
+            )
+          else if (error != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
               child:
-                  widget.newPageProgressIndicator ??
-                  const CircularProgressIndicator(),
-            ),
-          )
-        else if (error != null)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child:
-                widget.newPageErrorIndicator ??
-                Center(
-                  child: Column(
-                    children: [
-                      Text('Error: $error'),
-                      TextButton(
-                        onPressed: () => widget.controller.loadMore(),
-                        child: const Text('Retry'),
-                      ),
-                    ],
+                  widget.newPageErrorIndicator ??
+                  Center(
+                    child: Column(
+                      children: [
+                        Text('Error: $error'),
+                        TextButton(
+                          onPressed: () => widget.controller.loadMore(),
+                          child: const Text('Retry'),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-          )
-        else if (!hasMore)
-          widget.noMoreItemsIndicator ?? const SizedBox.shrink(),
+            )
+          else if (!hasMore)
+            widget.noMoreItemsIndicator ?? const SizedBox.shrink(),
+        ],
       ],
     );
   }

@@ -49,10 +49,69 @@ class _CommunityListScreenState extends State<CommunityListScreen> {
           ),
         ],
       ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(color: Colors.blue),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text('Super Scroll',
+                      style: TextStyle(color: Colors.white, fontSize: 24)),
+                  Text('Demo Examples',
+                      style: TextStyle(color: Colors.white70, fontSize: 14)),
+                ],
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text('Users List'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushReplacementNamed(context, '/');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.business_center),
+              title: const Text('Businesses List'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushReplacementNamed(context, '/businesses');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.group),
+              title: const Text('Communities List'),
+              selected: true,
+              onTap: () => Navigator.pop(context),
+            ),
+          ],
+        ),
+      ),
       body: SuperListView.separated(
         controller: _controller,
         onRefresh: () => _controller.refresh(),
         padding: const EdgeInsets.all(16),
+        firstPageProgressIndicator: Column(
+          children: List.generate(
+            10,
+            (index) => const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.0),
+              child: ListTile(
+                leading: SuperSkeleton.circle(size: 40),
+                title: SuperSkeleton(height: 16, width: 150),
+                subtitle: SuperSkeleton(height: 12, width: 220),
+              ),
+            ),
+          ),
+        ),
+        newPageProgressIndicator: const ListTile(
+          leading: SuperSkeleton.circle(size: 40),
+          title: SuperSkeleton(height: 16, width: 150),
+        ),
         itemBuilder: (context, community, index) {
           return ListTile(
             leading: CircleAvatar(

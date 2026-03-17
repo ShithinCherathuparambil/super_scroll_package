@@ -1,5 +1,5 @@
-import 'dart:developer';
 import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../models/business_response.dart';
 
 class BusinessService {
@@ -13,17 +13,32 @@ class BusinessService {
     int page, {
     String search = '',
   }) async {
+    String url = baseUrl ?? '';
+    if (url.isEmpty) {
+      url = dotenv.maybeGet('BUSSINESS_PAGE_LISTING') ?? '';
+    }
+
+    final Map<String, dynamic> queryParams = {
+      'page': page,
+      'limit': 10,
+    };
+    if (search.isNotEmpty) {
+      queryParams['search'] = search;
+    }
+
+    final effectiveHeaders = headers ??
+        {
+          'Authorization': 'Bearer ${dotenv.maybeGet('AUTH_TOKEN') ?? ''}',
+          'Timezone': 'Asia/Kolkata',
+          'Accept-Language': 'en',
+        };
+
     try {
       final response = await _dio.get(
-        baseUrl ?? 'https://',
-        queryParameters: {'limit': 10, 'page': page, 'search': search},
-        options: Options(
-          headers: headers ??
-              {'Authorization': 'Bearer nlvszclfrgimdxfjmxLcafgsdfdx'},
-        ),
+        url,
+        queryParameters: queryParams,
+        options: Options(headers: effectiveHeaders),
       );
-
-      log('fetchBusinesses - ${response.realUri} - ${response.data}');
 
       if (response.statusCode == 200) {
         return BusinessResponse.fromJson(response.data);
