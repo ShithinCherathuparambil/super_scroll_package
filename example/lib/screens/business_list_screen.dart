@@ -8,7 +8,10 @@ enum BusinessViewType {
   listViewSeparated,
   gridViewCount,
   gridViewExtent,
-  slivers,
+  gridViewStandard,
+  masonryGrid,
+  sliverList,
+  sliverGrid,
   rawSuperScroll,
 }
 
@@ -71,7 +74,11 @@ class _BusinessListScreenState extends State<BusinessListScreen> {
                         business.logo['url'],
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) =>
-                            const Icon(Icons.business, size: 40, color: Colors.blue),
+                            const Icon(
+                              Icons.business,
+                              size: 40,
+                              color: Colors.blue,
+                            ),
                       )
                     : const Icon(Icons.business, size: 40, color: Colors.blue),
               ),
@@ -124,20 +131,6 @@ class _BusinessListScreenState extends State<BusinessListScreen> {
           controller: _controller,
           onRefresh: () => _controller.refresh(),
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          firstPageProgressIndicator: Column(
-            children: List.generate(
-              10,
-              (index) => ListTile(
-                leading: const SuperSkeleton.circle(size: 40),
-                title: const SuperSkeleton(height: 16, width: 150),
-                subtitle: const SuperSkeleton(height: 12, width: 220),
-              ),
-            ),
-          ),
-          newPageProgressIndicator: ListTile(
-            leading: const SuperSkeleton.circle(size: 40),
-            title: const SuperSkeleton(height: 16, width: 150),
-          ),
           itemBuilder: (context, business, index) => _buildItem(business),
         );
       case BusinessViewType.listViewSeparated:
@@ -145,20 +138,6 @@ class _BusinessListScreenState extends State<BusinessListScreen> {
           controller: _controller,
           onRefresh: () => _controller.refresh(),
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          firstPageProgressIndicator: Column(
-            children: List.generate(
-              10,
-              (index) => ListTile(
-                leading: const SuperSkeleton.circle(size: 40),
-                title: const SuperSkeleton(height: 16, width: 150),
-                subtitle: const SuperSkeleton(height: 12, width: 220),
-              ),
-            ),
-          ),
-          newPageProgressIndicator: ListTile(
-            leading: const SuperSkeleton.circle(size: 40),
-            title: const SuperSkeleton(height: 16, width: 150),
-          ),
           itemBuilder: (context, business, index) => _buildItem(business),
           separatorBuilder: (context, index) => const Divider(height: 1),
         );
@@ -171,42 +150,6 @@ class _BusinessListScreenState extends State<BusinessListScreen> {
           childAspectRatio: 0.8,
           onRefresh: () => _controller.refresh(),
           padding: const EdgeInsets.all(16),
-          firstPageProgressIndicator: GridView.count(
-            crossAxisCount: 2,
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-            childAspectRatio: 0.8,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            children: List.generate(
-              8,
-              (index) => Card(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const Expanded(child: SuperSkeleton()),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SuperSkeleton(height: 14, width: 100),
-                          const SizedBox(height: 4),
-                          const SuperSkeleton(height: 10, width: 60),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          newPageProgressIndicator: const Card(
-            child: Padding(
-              padding: EdgeInsets.all(8.0),
-              child: SuperSkeleton(height: 20),
-            ),
-          ),
           itemBuilder: (context, business, index) => _buildItem(business),
         );
       case BusinessViewType.gridViewExtent:
@@ -220,35 +163,73 @@ class _BusinessListScreenState extends State<BusinessListScreen> {
           padding: const EdgeInsets.all(16),
           itemBuilder: (context, business, index) => _buildItem(business),
         );
-      case BusinessViewType.slivers:
-        return SuperScroll(
+      case BusinessViewType.gridViewStandard:
+        return SuperGridView(
           controller: _controller,
-          showFooter: false,
-          child: CustomScrollView(
-            slivers: [
-              const SliverAppBar(
-                floating: true,
-                title: Text('Inside CustomScrollView'),
-                backgroundColor: Colors.blueGrey,
-              ),
-              const SliverToBoxAdapter(
-                child: Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Text('The list below is a SuperSliverList',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+            mainAxisSpacing: 4,
+            crossAxisSpacing: 4,
+          ),
+          onRefresh: () => _controller.refresh(),
+          padding: const EdgeInsets.all(8),
+          itemBuilder: (context, business, index) => _buildItem(business),
+        );
+      case BusinessViewType.masonryGrid:
+        return SuperMasonryGridView(
+          controller: _controller,
+          crossAxisCount: 2,
+          mainAxisSpacing: 8,
+          crossAxisSpacing: 8,
+          padding: const EdgeInsets.all(16),
+          itemBuilder: (context, business, index) => _buildItem(business),
+        );
+      case BusinessViewType.sliverList:
+        return CustomScrollView(
+          slivers: [
+            const SliverAppBar(
+              floating: true,
+              title: Text('Inside CustomScrollView'),
+              backgroundColor: Colors.blueGrey,
+            ),
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text(
+                  'The list below is a SuperSliverList',
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
-              SuperSliverList(
-                controller: _controller,
-                itemBuilder: (context, business, index) => _buildItem(business),
+            ),
+            SuperSliverList(
+              controller: _controller,
+              itemBuilder: (context, business, index) => _buildItem(business),
+            ),
+          ],
+        );
+      case BusinessViewType.sliverGrid:
+        return CustomScrollView(
+          slivers: [
+            const SliverAppBar(
+              floating: true,
+              title: Text('Sliver Grid Pattern'),
+              backgroundColor: Colors.indigo,
+            ),
+            SuperSliverGridGroup(
+              controller: _controller,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 8,
+                crossAxisSpacing: 8,
+                childAspectRatio: 0.8,
               ),
-            ],
-          ),
+              itemBuilder: (context, business, index) => _buildItem(business),
+            ),
+          ],
         );
       case BusinessViewType.rawSuperScroll:
         return SuperScroll(
           controller: _controller,
-          showFooter: true,
           child: ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             itemCount: _controller.items.length,
@@ -287,12 +268,24 @@ class _BusinessListScreenState extends State<BusinessListScreen> {
                 child: Text('GridView.extent'),
               ),
               const PopupMenuItem(
-                value: BusinessViewType.rawSuperScroll,
-                child: Text('Raw SuperScroll'),
+                value: BusinessViewType.gridViewStandard,
+                child: Text('GridView (Standard)'),
               ),
               const PopupMenuItem(
-                value: BusinessViewType.slivers,
+                value: BusinessViewType.masonryGrid,
+                child: Text('Masonry Grid'),
+              ),
+              const PopupMenuItem(
+                value: BusinessViewType.sliverList,
                 child: Text('Sliver List'),
+              ),
+              const PopupMenuItem(
+                value: BusinessViewType.sliverGrid,
+                child: Text('Sliver Grid'),
+              ),
+              const PopupMenuItem(
+                value: BusinessViewType.rawSuperScroll,
+                child: Text('Raw SuperScroll'),
               ),
             ],
           ),
@@ -312,10 +305,14 @@ class _BusinessListScreenState extends State<BusinessListScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Text('Super Scroll',
-                      style: TextStyle(color: Colors.white, fontSize: 24)),
-                  Text('Demo Examples',
-                      style: TextStyle(color: Colors.white70, fontSize: 14)),
+                  Text(
+                    'Super Scroll',
+                    style: TextStyle(color: Colors.white, fontSize: 24),
+                  ),
+                  Text(
+                    'Demo Examples',
+                    style: TextStyle(color: Colors.white70, fontSize: 14),
+                  ),
                 ],
               ),
             ),
