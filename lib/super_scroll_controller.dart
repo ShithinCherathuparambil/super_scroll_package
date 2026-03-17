@@ -47,7 +47,9 @@ class SuperScrollController<T> extends ChangeNotifier {
 
   /// Loads the next page of data.
   Future<void> loadMore() async {
-    if (_isLoading || !_hasMore) return;
+    if (_isLoading || !_hasMore) {
+      return;
+    }
 
     _isLoading = true;
     _error = null;
@@ -72,7 +74,9 @@ class SuperScrollController<T> extends ChangeNotifier {
   /// If [page] is null, it clears everything and starts over from page 1.
   Future<void> refresh({int? page}) async {
     if (page != null) {
-      if (!_pageItemCounts.containsKey(page)) return;
+      if (!_pageItemCounts.containsKey(page)) {
+        return;
+      }
 
       _isLoading = true;
       notifyListeners();

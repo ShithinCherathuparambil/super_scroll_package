@@ -4,19 +4,21 @@ import '../models/community_model.dart';
 import '../services/community_service.dart';
 
 class CommunityListScreen extends StatefulWidget {
-  const CommunityListScreen({super.key});
+  final CommunityService? communityService;
+  const CommunityListScreen({super.key, this.communityService});
 
   @override
   State<CommunityListScreen> createState() => _CommunityListScreenState();
 }
 
 class _CommunityListScreenState extends State<CommunityListScreen> {
-  final CommunityService _communityService = CommunityService();
+  late final CommunityService _communityService;
   late final SuperScrollController<CommunityModel> _controller;
 
   @override
   void initState() {
     super.initState();
+    _communityService = widget.communityService ?? CommunityService();
     _controller = SuperScrollController<CommunityModel>(
       onFetch: (page) async {
         final response = await _communityService.fetchCommunities(page);

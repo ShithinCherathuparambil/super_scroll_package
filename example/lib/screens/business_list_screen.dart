@@ -12,14 +12,15 @@ enum BusinessViewType {
 }
 
 class BusinessListScreen extends StatefulWidget {
-  const BusinessListScreen({super.key});
+  final BusinessService? businessService;
+  const BusinessListScreen({super.key, this.businessService});
 
   @override
   State<BusinessListScreen> createState() => _BusinessListScreenState();
 }
 
 class _BusinessListScreenState extends State<BusinessListScreen> {
-  final BusinessService _businessService = BusinessService();
+  late final BusinessService _businessService;
   late final SuperScrollController<BusinessModel> _controller;
   final TextEditingController _searchController = TextEditingController();
   BusinessViewType _viewType = BusinessViewType.listViewSeparated;
@@ -27,6 +28,7 @@ class _BusinessListScreenState extends State<BusinessListScreen> {
   @override
   void initState() {
     super.initState();
+    _businessService = widget.businessService ?? BusinessService();
     _controller = SuperScrollController<BusinessModel>(
       onFetch: (page) async {
         final response = await _businessService.fetchBusinesses(

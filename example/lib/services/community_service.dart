@@ -3,15 +3,19 @@ import 'package:dio/dio.dart';
 import '../models/community_response.dart';
 
 class CommunityService {
-  final Dio _dio = Dio();
+  final Dio _dio;
+  final String? baseUrl;
+  final Map<String, String>? headers;
+
+  CommunityService({Dio? dio, this.baseUrl, this.headers}) : _dio = dio ?? Dio();
 
   Future<CommunityResponse> fetchCommunities(int page) async {
     try {
       final response = await _dio.get(
-        'https://',
+        baseUrl ?? 'https://',
         queryParameters: {'limit': 10, 'page': page},
         options: Options(
-          headers: {'Authorization': 'Bearer sdacdfcxnaufhkuaefxa'},
+          headers: headers ?? {'Authorization': 'Bearer sdacdfcxnaufhkuaefxa'},
         ),
       );
 

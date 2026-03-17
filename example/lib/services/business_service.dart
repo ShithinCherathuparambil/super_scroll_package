@@ -3,7 +3,11 @@ import 'package:dio/dio.dart';
 import '../models/business_response.dart';
 
 class BusinessService {
-  final Dio _dio = Dio();
+  final Dio _dio;
+  final String? baseUrl;
+  final Map<String, String>? headers;
+
+  BusinessService({Dio? dio, this.baseUrl, this.headers}) : _dio = dio ?? Dio();
 
   Future<BusinessResponse> fetchBusinesses(
     int page, {
@@ -11,10 +15,11 @@ class BusinessService {
   }) async {
     try {
       final response = await _dio.get(
-        'https://',
+        baseUrl ?? 'https://',
         queryParameters: {'limit': 10, 'page': page, 'search': search},
         options: Options(
-          headers: {'Authorization': 'Bearer nlvszclfrgimdxfjmxLcafgsdfdx'},
+          headers: headers ??
+              {'Authorization': 'Bearer nlvszclfrgimdxfjmxLcafgsdfdx'},
         ),
       );
 

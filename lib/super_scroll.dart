@@ -6,7 +6,7 @@ export 'super_list_view.dart';
 export 'super_grid_view.dart';
 
 /// A simple and lightweight pagination widget for Flutter.
-/// 
+///
 /// [SuperScroll] wraps a scrollable widget and uses a [SuperScrollController]
 /// to manage pagination logic automatically.
 class SuperScroll extends StatefulWidget {
@@ -91,12 +91,16 @@ class _SuperScrollState extends State<SuperScroll> {
   }
 
   void _onControllerUpdate() {
-    if (!mounted) return;
+    if (!mounted) {
+      return;
+    }
     setState(() {});
 
     // Check if we need to load more because the viewport is not filled
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
       _checkIfViewportNeedsFilling();
     });
   }
@@ -104,7 +108,9 @@ class _SuperScrollState extends State<SuperScroll> {
   void _checkIfViewportNeedsFilling() {
     if (widget.controller.isLoading ||
         !widget.controller.hasMore ||
-        widget.controller.error != null) return;
+        widget.controller.error != null) {
+      return;
+    }
 
     final scrollController = _effectiveController;
     if (scrollController.hasClients) {
@@ -127,7 +133,9 @@ class _SuperScrollState extends State<SuperScroll> {
         widget.controller.hasMore &&
         widget.controller.error == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) _checkIfViewportNeedsFilling();
+        if (mounted) {
+          _checkIfViewportNeedsFilling();
+        }
       });
     }
 
@@ -139,7 +147,8 @@ class _SuperScrollState extends State<SuperScroll> {
     // Handle First Page Loading
     if (items.isEmpty && isLoading) {
       return Center(
-        child: widget.firstPageProgressIndicator ??
+        child:
+            widget.firstPageProgressIndicator ??
             const CircularProgressIndicator(),
       );
     }
@@ -190,14 +199,16 @@ class _SuperScrollState extends State<SuperScroll> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: Center(
-              child: widget.newPageProgressIndicator ??
+              child:
+                  widget.newPageProgressIndicator ??
                   const CircularProgressIndicator(),
             ),
           )
         else if (error != null)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: widget.newPageErrorIndicator ??
+            child:
+                widget.newPageErrorIndicator ??
                 Center(
                   child: Column(
                     children: [

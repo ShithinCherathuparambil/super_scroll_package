@@ -21,11 +21,11 @@ class CommunityModel {
 
   factory CommunityModel.fromJson(Map<String, dynamic> json) {
     return CommunityModel(
-      id: json['id'],
-      uid: json['uid'],
-      name: json['name'],
-      member: json['member'],
-      post: json['post'],
+      id: json['id'] ?? 0,
+      uid: json['uid'] ?? '',
+      name: json['name'] ?? '',
+      member: json['member'] ?? 0,
+      post: json['post'] ?? 0,
       logo: json['logo'],
       isFollowed: json['is_followed'] ?? false,
       specialityCommunity: json['speciality_community'] ?? false,

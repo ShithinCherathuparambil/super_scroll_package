@@ -5,9 +5,13 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../models/user_response.dart';
 
 class UserService {
-  final Dio _dio = Dio();
+  final Dio _dio;
+  final String? baseUrl;
+  final Map<String, String>? headers;
 
-  String get _baseUrl => dotenv.get('API_URL', fallback: 'https://');
+  UserService({Dio? dio, this.baseUrl, this.headers}) : _dio = dio ?? Dio();
+
+  String get _baseUrl => baseUrl ?? dotenv.get('API_URL', fallback: 'https://');
 
   Future<UserResponse> fetchUsers(int page) async {
     try {
@@ -15,11 +19,12 @@ class UserService {
         '$_baseUrl/users',
         queryParameters: {'page': page},
         options: Options(
-          headers: {
-            'x-api-key': dotenv.get('X_API_KEY', fallback: ''),
-            'Authorization':
-                'Bearer ${dotenv.get('SESSION_TOKEN', fallback: '')}',
-          },
+          headers: headers ??
+              {
+                'x-api-key': dotenv.get('X_API_KEY', fallback: ''),
+                'Authorization':
+                    'Bearer ${dotenv.get('SESSION_TOKEN', fallback: '')}',
+              },
         ),
       );
       log('fetchUsers - ${response.realUri} - ${response.data}');

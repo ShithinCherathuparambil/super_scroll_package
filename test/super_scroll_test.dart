@@ -177,7 +177,7 @@ void main() {
         home: Scaffold(
           body: SuperListView.builder(
             controller: controller,
-            itemBuilder: (context, item, index) => Container(
+            itemBuilder: (context, item, index) => SizedBox(
               height: 50, // Small height
               child: ListTile(title: Text(item)),
             ),

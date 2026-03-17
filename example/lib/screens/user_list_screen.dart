@@ -4,19 +4,21 @@ import '../services/user_service.dart';
 import 'package:super_scroll/super_scroll.dart';
 
 class UserListScreen extends StatefulWidget {
-  const UserListScreen({super.key});
+  final UserService? userService;
+  const UserListScreen({super.key, this.userService});
 
   @override
   State<UserListScreen> createState() => _UserListScreenState();
 }
 
 class _UserListScreenState extends State<UserListScreen> {
-  final UserService _userService = UserService();
+  late final UserService _userService;
   late final SuperScrollController<UserModel> _controller;
 
   @override
   void initState() {
     super.initState();
+    _userService = widget.userService ?? UserService();
     _controller = SuperScrollController<UserModel>(
       onFetch: (page) async {
         final response = await _userService.fetchUsers(page);
