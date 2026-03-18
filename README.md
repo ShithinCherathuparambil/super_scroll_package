@@ -1,7 +1,5 @@
 # Super Scroll
 
-# Super Scroll
-
 [![pub package](https://img.shields.io/pub/v/super_scroll.svg)](https://pub.dev/packages/super_scroll) [![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](https://opensource.org/licenses/MIT) ![Platform](https://img.shields.io/badge/platform-android%20|%20ios%20|%20web%20|%20macos%20|%20windows%20|%20linux-blue.svg)
 
 A simple, lightweight, and powerful pagination library for Flutter. **Production ready and cross-platform stable.**
@@ -132,15 +130,6 @@ SuperScroll(
   ),
 )
 ```
-
-## 📝 Comparison
-
-| Feature | Super Scroll | Infinite Scroll Pagination |
-| :--- | :--- | :--- |
-| **Boilerplate** | Low (High-level widgets included) | High (Requires customPagedView/Delegate) |
-| **Viewport Filling** | Automatic | Manual |
-| **Specific Page Refresh**| Yes (`refresh(page: n)`) | No |
-| **Weight** | Lightweight | Heavier |
 
 ## 🤝 Contributing
 Contributions are welcome! Please feel free to submit a Pull Request or open an issue for any bugs or feature requests.
