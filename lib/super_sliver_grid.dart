@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'super_scroll.dart';
+import 'super_scroll_controller.dart';
+import 'super_skeleton.dart';
 
 /// A [SliverGrid] that supports pagination using [SuperScrollController].
 class SuperSliverGrid<T> extends StatelessWidget {
@@ -81,8 +82,13 @@ class SuperSliverGridGroup<T> extends StatelessWidget {
                 child:
                     newPageProgressIndicator ??
                     const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 16.0),
-                      child: Center(child: CircularProgressIndicator()),
+                      padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+                      child: Center(
+                        child: SuperSkeleton(
+                          height: 20,
+                          width: 200,
+                        ),
+                      ),
                     ),
               ),
             if (error != null)

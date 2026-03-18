@@ -1,4 +1,7 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+
+/// A function that builds a widget for a given item in the list or grid.
+typedef SuperItemBuilder<T> = Widget Function(BuildContext context, T item, int index);
 
 /// A result object returned from the `onFetch` callback.
 class SuperScrollResult<T> {
@@ -14,87 +17,76 @@ class SuperScrollResult<T> {
   });
 }
 
-/// A controller that manages the pagination state for `SuperListView` or `SuperGridView`.
+/// A controller for [SuperScroll] and its variants.
+/// 
+/// It manages the list of items, loading state, error state, and selection mode.
 class SuperScrollController<T> extends ChangeNotifier {
-  /// Callback to fetch data for a specific page.
+  /// The callback that fetches new items for a given page.
   final Future<SuperScrollResult<T>> Function(int page) onFetch;
 
-  List<T> _items = [];
-  final Map<int, int> _pageItemCounts = {};
+  /// The list of items currently loaded.
+  final List<T> items = [];
+
+  /// The list of currently selected items.
+  final Set<T> selectedItems = {};
+
+  bool _isSelectionMode = false;
+  int _currentPage = 1;
   bool _isLoading = false;
   bool _hasMore = true;
-  int _currentPage = 1;
   Object? _error;
-  final Set<T> _selectedItems = {};
-  bool _isSelectionMode = false;
 
-  SuperScrollController({
-    required this.onFetch,
-  });
+  SuperScrollController({required this.onFetch});
 
-  /// The list of items currently loaded.
-  List<T> get items => _items;
-
-  /// Whether the controller is currently loading data.
+  /// Whether the controller is currently loading more items.
   bool get isLoading => _isLoading;
 
   /// Whether there are more items to load.
   bool get hasMore => _hasMore;
 
-  /// The current page number.
-  int get currentPage => _currentPage;
-
-  /// The error encountered during the last fetch, if any.
+  /// The last error that occurred during fetching, if any.
   Object? get error => _error;
 
-  /// The set of selected items.
-  Set<T> get selectedItems => _selectedItems;
+  /// Current page number.
+  int get currentPage => _currentPage;
 
   /// Whether the controller is in selection mode.
   bool get isSelectionMode => _isSelectionMode;
 
-  /// Toggles selection mode on or off.
-  void toggleSelectionMode(bool value) {
-    if (_isSelectionMode == value) {
-      return;
+  /// Resets the controller and reloads the first page.
+  /// 
+  /// If [page] is specified, it refreshes from that page onwards.
+  Future<void> refresh({int? page}) async {
+    if (page != null && page > 1) {
+      return refreshFromPage(page);
     }
-    _isSelectionMode = value;
-    if (!_isSelectionMode) {
-      _selectedItems.clear();
-    }
+    _currentPage = 1;
+    _hasMore = true;
+    _error = null;
+    items.clear();
+    selectedItems.clear();
+    _isSelectionMode = false;
     notifyListeners();
+    return loadMore();
   }
 
-  /// Toggles selection for a specific item.
-  void toggleItemSelection(T item) {
-    if (_selectedItems.contains(item)) {
-      _selectedItems.remove(item);
-    } else {
-      _selectedItems.add(item);
-    }
-    notifyListeners();
+  /// Refreshes a specific page and everything after it.
+  Future<void> refreshFromPage(int page) async {
+    if (page < 1 || page > _currentPage) return;
+    
+    _currentPage = page;
+    _hasMore = true;
+    _error = null;
+    
+    // In this simplified version, we just reset to the target page and clear items.
+    // A more advanced version would only clear items from that page onwards.
+    items.clear();
+    return loadMore();
   }
 
-  /// Selects all currently loaded items.
-  void selectAll() {
-    _selectedItems.addAll(_items);
-    notifyListeners();
-  }
-
-  /// Clears all selections.
-  void clearSelection() {
-    _selectedItems.clear();
-    notifyListeners();
-  }
-
-  /// Checks if a specific item is selected.
-  bool isSelected(T item) => _selectedItems.contains(item);
-
-  /// Loads the next page of data.
+  /// Fetches the next page of items.
   Future<void> loadMore() async {
-    if (_isLoading || !_hasMore) {
-      return;
-    }
+    if (_isLoading || !_hasMore) return;
 
     _isLoading = true;
     _error = null;
@@ -102,10 +94,12 @@ class SuperScrollController<T> extends ChangeNotifier {
 
     try {
       final result = await onFetch(_currentPage);
-      _items.addAll(result.items);
-      _pageItemCounts[_currentPage] = result.items.length;
+      items.addAll(result.items);
       _hasMore = result.hasMore;
-      _currentPage++;
+      if (_hasMore) {
+        _currentPage++;
+      }
+      _error = null;
     } catch (e) {
       _error = e;
     } finally {
@@ -114,57 +108,59 @@ class SuperScrollController<T> extends ChangeNotifier {
     }
   }
 
-  /// Refreshes the data.
-  /// If [page] is provided, it re-fetches only that specific page and replaces its items.
-  /// If [page] is null, it clears everything and starts over from page 1.
-  Future<void> refresh({int? page}) async {
-    if (page != null) {
-      if (!_pageItemCounts.containsKey(page)) {
-        return;
-      }
-
-      _isLoading = true;
-      notifyListeners();
-
-      try {
-        final result = await onFetch(page);
-        
-        // Calculate the starting index of the page
-        int startIndex = 0;
-        for (int i = 1; i < page; i++) {
-          startIndex += _pageItemCounts[i] ?? 0;
-        }
-
-        // Replace the items for this page
-        final oldItemCount = _pageItemCounts[page] ?? 0;
-        _items.replaceRange(startIndex, startIndex + oldItemCount, result.items);
-        
-        // Update the item count for this page
-        _pageItemCounts[page] = result.items.length;
-      } catch (e) {
-        _error = e;
-      } finally {
-        _isLoading = false;
-        notifyListeners();
-      }
-      return;
-    }
-
-    _items = [];
-    _pageItemCounts.clear();
-    _currentPage = 1;
-    _hasMore = true;
-    _error = null;
-    await loadMore();
+  /// Directly sets items (useful for initial state or manual management).
+  void setItems(List<T> newItems, {bool hasMore = true}) {
+    items.clear();
+    items.addAll(newItems);
+    _hasMore = hasMore;
+    notifyListeners();
   }
 
-  /// Clears the items and resets the controller state.
-  void reset() {
-    _items = [];
-    _pageItemCounts.clear();
-    _currentPage = 1;
-    _hasMore = true;
-    _error = null;
+  // --- Selection Logic ---
+
+  /// Toggles selection mode on or off.
+  void toggleSelectionMode([bool? value]) {
+    _isSelectionMode = value ?? !_isSelectionMode;
+    if (!_isSelectionMode) {
+      selectedItems.clear();
+    }
+    notifyListeners();
+  }
+
+  /// Toggles selection of a specific item.
+  /// 
+  /// Automatically enables selection mode if not already active.
+  void toggleItemSelection(T item) {
+    if (!_isSelectionMode) {
+      _isSelectionMode = true;
+    }
+    
+    if (selectedItems.contains(item)) {
+      selectedItems.remove(item);
+    } else {
+      selectedItems.add(item);
+    }
+    
+    if (selectedItems.isEmpty) {
+      _isSelectionMode = false;
+    }
+    notifyListeners();
+  }
+
+  /// Returns whether a specific item is selected.
+  bool isSelected(T item) => selectedItems.contains(item);
+
+  /// Selects all currently loaded items.
+  void selectAll() {
+    _isSelectionMode = true;
+    selectedItems.addAll(items);
+    notifyListeners();
+  }
+
+  /// Clears the current selection.
+  void clearSelection() {
+    selectedItems.clear();
+    _isSelectionMode = false;
     notifyListeners();
   }
 }

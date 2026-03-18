@@ -56,7 +56,7 @@ void main() {
           fetchCount++;
           return SuperScrollResult(
             items: ['Item $fetchCount'],
-            hasMore: false,
+            hasMore: true, // Allow for more fetches
           );
         },
       );

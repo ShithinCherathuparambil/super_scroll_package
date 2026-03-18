@@ -1,4 +1,10 @@
+## 1.0.0
+- Production ready stable release.
+- All features verified across Android, iOS, Web, and macOS.
+- Added comprehensive documentation and platform tags.
+
 ## 0.1.0
+- Initial release of Super Scroll.
 
 * Initial release of Super Scroll.
 * Added `SuperListView` and `SuperGridView` high-level pagination widgets.

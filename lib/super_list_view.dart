@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'super_scroll.dart';
-
-typedef SuperItemBuilder<T> =
-    Widget Function(BuildContext context, T item, int index);
+import 'super_scroll_controller.dart';
+import 'super_scroll_base.dart';
 
 class SuperListView<T> extends StatefulWidget {
   final SuperScrollController<T> controller;
   final SuperItemBuilder<T> itemBuilder;
-  final IndexedWidgetBuilder? separatorBuilder;
+  final Widget Function(BuildContext, int)? separatorBuilder;
   final EdgeInsetsGeometry? padding;
   final ScrollPhysics? physics;
   final bool shrinkWrap;
@@ -15,22 +13,12 @@ class SuperListView<T> extends StatefulWidget {
   final VoidCallback? onRefresh;
   final ScrollController? scrollController;
 
-  /// Widget to display at the bottom when loading subsequent pages.
+  /// Indicators for different states
   final Widget? newPageProgressIndicator;
-
-  /// Widget to display when the first page is loading.
   final Widget? firstPageProgressIndicator;
-
-  /// Widget to display when an error occurs fetching the first page.
   final Widget? firstPageErrorIndicator;
-
-  /// Widget to display when an error occurs fetching a subsequent page.
   final Widget? newPageErrorIndicator;
-
-  /// Widget to display when no items were found on the first page.
   final Widget? noItemsFoundIndicator;
-
-  /// Widget to display when there are no more items to load.
   final Widget? noMoreItemsIndicator;
 
   const SuperListView.builder({

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'super_scroll.dart';
+import 'super_scroll_controller.dart';
+import 'super_scroll_base.dart';
+import 'super_skeleton.dart';
 
 /// A dependency-free masonry-style grid that supports pagination.
 /// 
@@ -54,7 +56,18 @@ class SuperMasonryGridView<T> extends StatelessWidget {
 
         if (items.isEmpty && isLoading) {
           return firstPageProgressIndicator ??
-              const Center(child: CircularProgressIndicator());
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(24.0),
+                  child: Column(
+                    children: [
+                      SuperSkeleton(height: 150, margin: EdgeInsets.only(bottom: 12)),
+                      SuperSkeleton(height: 100, margin: EdgeInsets.only(bottom: 12)),
+                      SuperSkeleton(height: 200),
+                    ],
+                  ),
+                ),
+              );
         }
 
         if (items.isEmpty && !isLoading && !hasMore) {
@@ -102,8 +115,13 @@ class SuperMasonryGridView<T> extends StatelessWidget {
               if (isLoading)
                 newPageProgressIndicator ??
                     const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 16.0),
-                      child: Center(child: CircularProgressIndicator()),
+                      padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+                      child: Center(
+                        child: SuperSkeleton(
+                          height: 20,
+                          width: 200,
+                        ),
+                      ),
                     ),
               if (error != null)
                 newPageErrorIndicator ??

@@ -71,11 +71,11 @@ void main() {
     );
 
     await tester.pump(); // Start load
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(find.byType(SuperSkeleton), findsWidgets);
 
     await tester.pump(const Duration(seconds: 1)); // Finish load
     await tester.pump(); // Rebuild with items
     expect(find.text('Item'), findsOneWidget);
-    expect(find.byType(CircularProgressIndicator), findsNothing);
+    expect(find.byType(SuperSkeleton), findsNothing);
   });
 }

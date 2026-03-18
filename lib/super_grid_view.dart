@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'super_scroll.dart';
+import 'super_scroll_controller.dart';
+import 'super_scroll_base.dart';
 
 class SuperGridView<T> extends StatefulWidget {
   final SuperScrollController<T> controller;

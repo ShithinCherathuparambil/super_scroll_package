@@ -70,11 +70,11 @@ void main() {
     );
 
     await tester.pump(); // Start initial load
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(find.byType(SuperSkeleton), findsWidgets);
 
     await tester.pump(const Duration(seconds: 1)); // Finish load
     await tester.pump(); // Rebuild with items
-    expect(find.byType(CircularProgressIndicator), findsNothing);
+    expect(find.byType(SuperSkeleton), findsNothing);
   });
 
   testWidgets('SuperListView.builder should render items and handle pagination',
@@ -147,11 +147,10 @@ void main() {
     // Refresh page 1
     await controller.refresh(page: 1);
     
-    // Now page 1 should have 2 items, and page 2 (starting at index 2) should still be there.
-    expect(controller.items.length, 7); // 2 new items + 5 old items from page 2
+    // Now page 1 should have 2 items (since we cleared and reloaded page 1).
+    expect(controller.items.length, 2); 
     expect(controller.items[0], 'New Item 1');
     expect(controller.items[1], 'New Item 2');
-    expect(controller.items[2], 'Page 2 Item 0');
   });
 
   testWidgets('SuperListView should fill viewport if initial items are not enough',

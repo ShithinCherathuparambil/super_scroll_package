@@ -1,6 +1,10 @@
 # Super Scroll
 
-A simple, lightweight, and powerful pagination library for Flutter.
+# Super Scroll
+
+[![pub package](https://img.shields.io/pub/v/super_scroll.svg)](https://pub.dev/packages/super_scroll) [![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](https://opensource.org/licenses/MIT) ![Platform](https://img.shields.io/badge/platform-android%20|%20ios%20|%20web%20|%20macos%20|%20windows%20|%20linux-blue.svg)
+
+A simple, lightweight, and powerful pagination library for Flutter. **Production ready and cross-platform stable.**
 
 `SuperScroll` makes it easy to add infinite scrolling to your lists or grids. It provides high-level "Super" widgets that handle pagination state, loading indicators, viewport filling, and error handling automatically with minimal boilerplate.
 
